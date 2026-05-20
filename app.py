@@ -52,14 +52,16 @@ if uploaded_files:
         rows = []
         TOP_N = top_n_slider
 
-        st.info("🔄 Processing and matching spectra...")
+        st.info("Processing and matching spectra...")
         progress_bar = st.progress(0)
         
-        query_spectra_list = list(su.load_query_spectra(query_dir_path, apply_smooth))
-        total_queries = len(query_spectra_list)
+        total_queries = len(list(query_dir_path.rglob("*.txt")))
+        processed_count = 0
 
-        for index, (key, qx, qy) in enumerate(query_spectra_list):
-            progress_bar.progress((index + 1) / total_queries)
+        for key, qx, qy in su.load_query_spectra(query_dir_path, apply_smooth):
+            processed_count += 1
+            if total_queries > 0:
+                progress_bar.progress(processed_count / total_queries)
             
             MIN_X = 250
             mask = (qx >= MIN_X)
@@ -132,7 +134,7 @@ if uploaded_files:
 
             best_cos, best_pea, best_path, yq_plot, yd_plot, x_plot = unique_matches[0]
 
-            st.markdown(f"Results for: **{key}**")
+            st.markdown(f"### Results for: **{key}**")
             
             fig = go.Figure()
             fig.add_trace(go.Scatter(
@@ -170,13 +172,13 @@ if uploaded_files:
                 ])
 
         progress_bar.empty()
-        st.success("✅ Processing completed successfully!")
+        st.success("Processing completed successfully!")
 
         if rows:
             st.subheader("Ranking table")
             df_results = pd.DataFrame(rows, columns=[
                 "Query", "Cosine Similarity", "Pearson Correlation", "DB Folder", "DB File Name", "Rank", "", ""
-                ])
+            ])
             st.dataframe(df_results, use_container_width=True)
 
             csv_buffer = df_results.to_csv(index=False).encode('utf-8')
