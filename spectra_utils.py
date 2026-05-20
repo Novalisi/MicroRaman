@@ -224,7 +224,7 @@ def preprocess_xy_custom(x: np.ndarray, y: np.ndarray, apply_smooth: bool) -> tu
     
     return x, y_final
 
-def load_query_spectra(QUERY_DIR: Path, apply_smooth:bool) -> Iterable[tuple[str, np.ndarray, np.ndarray]]:
+def load_query_spectra(QUERY_DIR: Path, apply_smooth: bool, whittaker_lambda: float = 100) -> Iterable[tuple[str, np.ndarray, np.ndarray]]:
     # Load spectra with Si correction and concatenation
     files = sorted(QUERY_DIR.rglob("*.txt"))
     if not files:
@@ -240,7 +240,7 @@ def load_query_spectra(QUERY_DIR: Path, apply_smooth:bool) -> Iterable[tuple[str
         x, y = concatenate_spectra(paths, tolerance=0.5, global_shift=global_shift)
 
         try:
-            x, y = preprocess_xy_custom(x, y, apply_smooth)
+            x, y = preprocess_xy_custom(x, y, apply_smooth, whittaker_lambda)
         except Exception as exc:
             print(f"Skip query {key}: {exc}")
             continue
