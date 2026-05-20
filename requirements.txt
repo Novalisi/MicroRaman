@@ -1,3 +1,5 @@
+python==3.11
+
 streamlit
 numpy>=1.26.0,<2.0.0
 pandas>=2.1.0,<2.3.0
