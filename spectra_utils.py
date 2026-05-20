@@ -343,7 +343,7 @@ def plot_rank_histograms(rows: list[list[str]]) -> None:
 def get_db_spectra_cache(apply_smooth:bool):
     # Saving the database in a cache files in order to make the script faster
 	cache_file = DB_ROOT / "database_cache.pkl"
-    
+	
     if cache_file.exists():
 		with open(cache_file, "rb") as f:
 			return pickle.load(f)
