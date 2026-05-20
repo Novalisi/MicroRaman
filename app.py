@@ -14,11 +14,11 @@ st.write("Upload here the file raw.")
 
 st.sidebar.header("Analysis settings")
 top_n_slider = st.sidebar.slider("Number of Top Match (TOP_N)", min_value=1, max_value=10, value=3)
-apply_smooth = st.sidebar.checkbox("Applica Smoothing Whittaker", value=True)
+apply_smooth = st.sidebar.checkbox("Apply Smoothing Whittaker", value=True)
 
 if apply_smooth:
     whittaker_lambda = st.sidebar.select_slider(
-        "Valore di Lambda (λ) per lo smoothing",
+        "Lambda value for smoothing",
         options=[1, 10, 50, 100, 500, 1000, 5000, 10000],
         value=100,
     )
