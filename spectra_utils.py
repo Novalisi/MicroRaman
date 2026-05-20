@@ -340,17 +340,16 @@ def plot_rank_histograms(rows: list[list[str]]) -> None:
 		plt.close()
 
 
-def get_db_spectra_cache(apply_smooth:bool):
-	# Saving the database in a cache files in order to make the script faster
-	cache_file = DB_ROOT / "database_cache.pkl"
-	if cache_file.exists():
-		with open(cache_file, "rb") as f:
-			return pickle.load(f)
-			
+def get_db_spectra_cache(apply_smooth: bool):
+    # Saving the database in a cache file in order to make the script faster
+    cache_file = DB_ROOT / "database_cache.pkl"
+    
+    if cache_file.exists():
+        with open(cache_file, "rb") as f:
+            return pickle.load(f)
+    
     items = load_db_spectra(True)
-
     return items
-
 
 def square_root_transform(yd: np.ndarray, yq: np.ndarray):
     # Square Root Transformation
