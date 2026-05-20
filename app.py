@@ -165,7 +165,7 @@ if uploaded_files:
                     legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01, bgcolor="rgba(255, 255, 255, 0.7)")
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
 
             for rank, (s_cos, s_pea, path, _, _, _) in enumerate(unique_matches, start=1):
                 rows.append([
@@ -180,7 +180,7 @@ if uploaded_files:
             df_results = pd.DataFrame(rows, columns=[
                 "Query", "Cosine Similarity", "Pearson Correlation", "DB Folder", "DB File Name", "Rank"
             ])
-            st.dataframe(df_results, use_container_width=True)
+            st.dataframe(df_results, width="stretch")
 
             csv_buffer = df_results.to_csv(index=False).encode('utf-8')
             st.download_button(
