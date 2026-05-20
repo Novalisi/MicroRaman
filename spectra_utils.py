@@ -14,7 +14,7 @@ import pickle
 from scipy.optimize import minimize
 
 
-DB_ROOT = Path(r"/work/SLoPP_and_SLoPP-E")
+DB_ROOT = Path(__file__).parent / "database"
 
 def extract_laser_id(filename: str) -> str:
     # Searching in the name of files the type of laser in order to apply the correction
