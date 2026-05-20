@@ -25,7 +25,7 @@ if apply_smooth:
 else:
     whittaker_lambda = None
 
-st.subheader("1. Carica i file Query")
+st.subheader("1. Upload Query files")
 uploaded_files = st.file_uploader(
     "Put here your .txt (also 'si' calibration files)", 
     type=["txt"], 
