@@ -14,7 +14,7 @@ import pickle
 from scipy.optimize import minimize
 
 
-DB_ROOT = Path(__file__).parent / "database"
+DB_ROOT = Path(__file__).parent
 
 def extract_laser_id(filename: str) -> str:
     # Searching in the name of files the type of laser in order to apply the correction
@@ -342,11 +342,12 @@ def plot_rank_histograms(rows: list[list[str]]) -> None:
 
 def get_db_spectra_cache(apply_smooth:bool):
     # Saving the database in a cache files in order to make the script faster
-    if Path("/work/db_cache.pkl").exists():
-        print("Cache charging")
-        with open("/work/db_cache.pkl", "rb") as f:
-            return pickle.load(f)
+	cache_file = DB_ROOT / "database_cache.pkl"
     
+    if cache_file.exists():
+        with open(cache_file, "rb") as f:
+            return pickle.load(f)
+			
     items = load_db_spectra(True)
 
     with open("/work/db_cache.pkl", "wb") as f:
