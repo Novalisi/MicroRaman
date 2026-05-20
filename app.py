@@ -9,16 +9,25 @@ import spectra_utils as su
 
 st.set_page_config(page_title="Raman Spectra Matching", layout="wide", page_icon="🔬")
 
-st.title("🔬 Raman Spectra Analysis & Matching")
-st.write("Carica i tuoi file di spettro grezzi per eseguire la calibrazione, la correzione della baseline e il matching con il database.")
+st.title("Raman Spectra Analysis & Matching")
+st.write("Upload here the file raw.")
 
-st.sidebar.header("⚙️ Impostazioni Analisi")
-top_n_slider = st.sidebar.slider("Numero di Top Match da visualizzare (TOP_N)", min_value=1, max_value=10, value=3)
+st.sidebar.header("Analysis settings")
+top_n_slider = st.sidebar.slider("Number of Top Match (TOP_N)", min_value=1, max_value=10, value=3)
 apply_smooth = st.sidebar.checkbox("Applica Smoothing Whittaker", value=True)
+
+if apply_smooth:
+    whittaker_lambda = st.sidebar.select_slider(
+        "Valore di Lambda (λ) per lo smoothing",
+        options=[1, 10, 50, 100, 500, 1000, 5000, 10000],
+        value=100,
+    )
+else:
+    whittaker_lambda = None
 
 st.subheader("1. Carica i file Query")
 uploaded_files = st.file_uploader(
-    "Trascina qui i tuoi file .txt (Puoi includere i file 'si' di calibrazione e le parti _01, _02 da concatenare)", 
+    "Put here your .txt (also 'si' calibration files)", 
     type=["txt"], 
     accept_multiple_files=True
 )
@@ -44,7 +53,7 @@ if uploaded_files:
         TOP_N = top_n_slider
 
         with st.spinner("Matching and pre-processing..."):
-            for key, qx, qy in su.load_query_spectra(query_dir_path, apply_smooth):
+            for key, qx, qy in su.load_query_spectra(query_dir_path, apply_smooth, whittaker_lambda):
                 
                 MIN_X = 250
                 mask = (qx >= MIN_X)
