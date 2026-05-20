@@ -345,8 +345,8 @@ def get_db_spectra_cache(apply_smooth:bool):
 	cache_file = DB_ROOT / "database_cache.pkl"
     
     if cache_file.exists():
-        with open(cache_file, "rb") as f:
-            return pickle.load(f)
+		with open(cache_file, "rb") as f:
+			return pickle.load(f)
 			
     items = load_db_spectra(True)
 
