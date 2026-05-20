@@ -42,7 +42,7 @@ if uploaded_files:
     rows = []
     TOP_N = top_n_slider
 
-    st.info("🔄 Processing and matching spectra...")
+    st.info("Processing and matching spectra...")
     progress_bar = st.progress(0.0)
     
     valid_files = [f for f in uploaded_files if not f.name.lower().startswith("si")]
@@ -151,50 +151,50 @@ if uploaded_files:
 
         best_cos, best_pea, best_path, yq_plot, yd_plot, x_plot = unique_matches[0]
 
-        st.markdown(f"### Results for: **{key}**")
-        
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=x_plot,
-            y=yq_plot,
-            mode='lines',
-            name=f"Query: {key}",
-            line=dict(color='blue', width=2)
-        ))
+        with st.expander(f"View Matching Results for: {key}"):
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=x_plot,
+                y=yq_plot,
+                mode='lines',
+                name=f"Query: {key}",
+                line=dict(color='blue', width=2)
+            ))
 
-        legend_text = f"DB Top Match: {best_path.name}<br>(Cos: {best_cos:.4f}, Pear: {best_pea:.4f})"
-        fig.add_trace(go.Scatter(
-            x=x_plot,
-            y=yd_plot,
-            mode='lines',
-            name=legend_text,
-            line=dict(color='red', width=1.5, dash='dash'),
-            opacity=0.8
-        ))
+            legend_text = f"DB Top Match: {best_path.name}<br>(Cos: {best_cos:.4f}, Pear: {best_pea:.4f})"
+            fig.add_trace(go.Scatter(
+                x=x_plot,
+                y=yd_plot,
+                mode='lines',
+                name=legend_text,
+                line=dict(color='red', width=1.5, dash='dash'),
+                opacity=0.8
+            ))
 
-        fig.update_layout(
-            title=f"Spectral Comparison: {key} vs {best_path.parent.name}",
-            xaxis_title="Relative Spectral Range (Interpolated) [cm⁻¹]",
-            yaxis_title="Intensity (Normalized)",
-            template="plotly_white",
-            hovermode="x unified",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01, bgcolor="rgba(255, 255, 255, 0.7)")
-        )
-        
-        st.plotly_chart(fig, use_container_width=True)
+            fig.update_layout(
+                title=f"Spectral Comparison: {key} vs {best_path.parent.name}",
+                xaxis_title="Relative Spectral Range (Interpolated) [cm⁻¹]",
+                yaxis_title="Intensity (Normalized)",
+                template="plotly_white",
+                hovermode="x unified",
+                height=400,
+                legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01, bgcolor="rgba(255, 255, 255, 0.7)")
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
 
         for rank, (s_cos, s_pea, path, _, _, _) in enumerate(unique_matches, start=1):
             rows.append([
-                key, f"{s_cos:.6f}", f"{s_pea:.6f}", path.parent.name, path.name, f"Rank {rank}", "", ""
+                key, f"{s_cos:.6f}", f"{s_pea:.6f}", path.parent.name, path.name, f"Rank {rank}"
             ])
 
     progress_bar.empty()
-    st.success("✅ Processing completed successfully!")
+    st.success("Processing completed successfully!")
 
     if rows:
         st.subheader("Ranking table")
         df_results = pd.DataFrame(rows, columns=[
-            "Query", "Cosine Similarity", "Pearson Correlation", "DB Folder", "DB File Name", "Rank", "", ""
+            "Query", "Cosine Similarity", "Pearson Correlation", "DB Folder", "DB File Name", "Rank"
         ])
         st.dataframe(df_results, use_container_width=True)
 
