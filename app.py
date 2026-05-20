@@ -23,7 +23,7 @@ if apply_smooth:
         value=100,
     )
 else:
-    whittaker_lambda = None
+    whittaker_lambda = 1000
 
 st.subheader("1. Upload Query files")
 uploaded_files = st.file_uploader(
@@ -33,6 +33,25 @@ uploaded_files = st.file_uploader(
 )
 
 if uploaded_files:
+    def patched_preprocess_xy_custom(x, y, apply_smooth, lam=whittaker_lambda):
+        if x.size < 3:
+            raise ValueError("Not enough points")
+
+        mask = x >= 200
+        x = x[mask]
+        y = y[mask]
+
+        baseline, y_corr = su.baseline_correct(x, y)
+        
+        if apply_smooth:
+            y_final = su.smooth_whittaker(x, y_corr, lam=lam)
+        else:
+            y_final = y_corr
+        
+        return x, y_final
+
+    su.preprocess_xy_custom = patched_preprocess_xy_custom
+
     with tempfile.TemporaryDirectory() as temp_dir:
         query_dir_path = Path(temp_dir)
         
