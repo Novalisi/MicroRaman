@@ -52,16 +52,13 @@ if uploaded_files:
         rows = []
         TOP_N = top_n_slider
 
-        st.info("Processing and matching spectra...")
-        progress_bar = st.progress(0)
+        st.info("🔄 Processing and matching spectra...")
+        progress_bar = st.progress(0.0)
         
-        total_queries = len(list(query_dir_path.rglob("*.txt")))
-        processed_count = 0
-
-        for key, qx, qy in su.load_query_spectra(query_dir_path, apply_smooth):
-            processed_count += 1
-            if total_queries > 0:
-                progress_bar.progress(processed_count / total_queries)
+        query_generator = su.load_query_spectra(query_dir_path, apply_smooth)
+        
+        for index, (key, qx, qy) in enumerate(query_generator):
+            progress_bar.progress(min((index + 1) * 0.1, 1.0))
             
             MIN_X = 250
             mask = (qx >= MIN_X)
@@ -172,7 +169,7 @@ if uploaded_files:
                 ])
 
         progress_bar.empty()
-        st.success("Processing completed successfully!")
+        st.success("✅ Processing completed successfully!")
 
         if rows:
             st.subheader("Ranking table")
