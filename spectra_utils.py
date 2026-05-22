@@ -369,5 +369,4 @@ def power_transformation(yd: np.ndarray, yq: np.ndarray):
     
     #yq_p = np.where(yq_p < 0.02 * np.max(yq_p), 0, yq_p)
     #yd_p = np.where(yd_p < 0.02 * np.max(yd_p), 0, yd_p)
-
 	return yd_p, yq_p
