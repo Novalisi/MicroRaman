@@ -360,8 +360,6 @@ def square_root_transform(yd: np.ndarray, yq: np.ndarray):
     #yq_proc = np.where(yq_proc < 0.1 * np.max(yq_proc), 0, yq_proc)
     #yd_proc = np.where(yd_proc < 0.1 * np.max(yd_proc), 0, yd_proc)
 
-    # L2 normalization, also used in the paper "Raman spectra comparison"
-
     return yd_proc, yq_proc
 
 def power_transformation(yd: np.ndarray, yq: np.ndarray):
@@ -372,67 +370,4 @@ def power_transformation(yd: np.ndarray, yq: np.ndarray):
     #yq_p = np.where(yq_p < 0.02 * np.max(yq_p), 0, yq_p)
     #yd_p = np.where(yd_p < 0.02 * np.max(yd_p), 0, yd_p)
 
-    # L2 normalization, also used in the paper "Raman spectra comparison"
-
-
-    return yd_p, yq_p
-
-
-def nn_en_mixture_analysis(y, X, component_names=None, lam=0.01, alpha=0.96):
-# Mixture analysis NN-EN:  https://doi.org/10.1002/cem.3293
-    y = np.array(y, dtype=float)
-    X = np.array(X, dtype=float)
-    N, M = X.shape
-    
-    if component_names is None:
-        component_names = [f"Polimero_{i+1}" for i in range(M)]
-        
-    def objective(r):
-        residual = np.linalg.norm(y - np.dot(X, r), ord=2)
-        l1_penalty = np.sum(np.abs(r))
-        l2_penalty = np.linalg.norm(r, ord=2)
-        
-        return residual + lam * (alpha * l1_penalty + (1 - alpha) * l2_penalty)
-
-    #  r >= 0
-    bounds = [(0, None) for _ in range(M)]
-    
-    r0 = np.ones(M) * 0.01
-    
-    res = minimize(objective, r0, bounds=bounds, method='L-BFGS-B')
-    
-    if not res.success:
-        print("[Sorgente] Attenzione: L'ottimizzazione non ha raggiunto una convergenza perfetta.")
-        
-    estimated_coefficients = res.x
-    
-    total_signal = np.sum(estimated_coefficients)
-    if total_signal > 0:
-        percentages = (estimated_coefficients / total_signal) * 100
-    else:
-        percentages = np.zeros(M)
-        
-    output_results = []
-    for i in range(M):
-        output_results.append({
-            "name": component_names[i],
-            "coefficient": estimated_coefficients[i],
-            "percentage": percentages[i]
-        })
-        
-    # best result first
-    output_results.sort(key=lambda x: x['coefficient'], reverse=True)
-    
-    print("\n" + "="*65)
-    print("      RISULTATI DECONVOLUZIONE MISCELA POLIMERICA (NN-EN)      ")
-    print("="*65)
-    print(f"{'Polimero / Componente':<30} | {'Concentrazione (Coeff)':<15} | {'Contributo %':<12}")
-    print("-"*65)
-    
-    for item in output_results:
-        if item['coefficient'] > 1e-4:
-            print(f"{item['name']:<30} | {item['coefficient']:<22.4f} | {item['percentage']:<10.2f}%")
-            
-    print("="*65)
-    
-    return output_results
+	return yd_p, yq_p
