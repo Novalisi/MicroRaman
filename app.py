@@ -26,6 +26,12 @@ if apply_smooth:
 else:
     whittaker_lambda = 1000
 
+transform_option = st.sidebar.radio(
+    "Mathematical Transformation",
+    options=["Adaptive (Square root only if peak > 2400 cm⁻¹)", "Force Square Root on all"],
+    index=0
+)
+
 st.subheader("Upload Query files")
 uploaded_files = st.file_uploader(
     "Here to upload your query spectra files (txt format, with two columns: wavenumber and intensity). You can upload multiple files at once. In order to better calibrate the spectra is used to use the peak of the silicon at 520 cm-1, so the spectra should contain this peak also for different laser wavelength. If you have different spectra for the same sample, please make sure to name them with the same base name (e.g., sample1_01.txt, sample1_02.txt) so they will be grouped together in the analysis, please refer to the documentation in the github repository for more information about the concatenation and preprocessing.", 
@@ -97,29 +103,34 @@ if uploaded_files:
 
                 yq, yd, xreal = resampled
 
-                if np.max(xreal) <= 2500:
-                    has_strong_peak = False
+                if transform_option == "Force Square Root on all":
+                    use_square_root = True
                 else:
-                    peak_mask = (xreal >= 2400) & (xreal <= 3200)
-                    if np.any(peak_mask):
-                        x_sub = xreal[peak_mask]
-                        y_sub = yq[peak_mask]
+                    if np.max(xreal) <= 2500:
+                        has_strong_peak = False
+                    else:
+                        peak_mask = (xreal >= 2400) & (xreal <= 3200)
+                        if np.any(peak_mask):
+                            x_sub = xreal[peak_mask]
+                            y_sub = yq[peak_mask]
 
-                        if np.max(x_sub) >= 2400:
-                            global_max = np.max(yq)
-                            peaks, _ = su.find_peaks(
-                                y_sub,
-                                height=0.5 * np.max(y_sub),
-                                prominence=0.1 * np.max(y_sub)
-                            )
-                            peak_strength = np.max(y_sub) / global_max
-                            has_strong_peak = (len(peaks) > 0 and peak_strength > 0.25)
+                            if np.max(x_sub) >= 2400:
+                                global_max = np.max(yq)
+                                peaks, _ = su.find_peaks(
+                                    y_sub,
+                                    height=0.5 * np.max(y_sub),
+                                    prominence=0.1 * np.max(y_sub)
+                                )
+                                peak_strength = np.max(y_sub) / global_max
+                                has_strong_peak = (len(peaks) > 0 and peak_strength > 0.25)
+                            else:
+                                has_strong_peak = False
                         else:
                             has_strong_peak = False
-                    else:
-                        has_strong_peak = False
+                    
+                    use_square_root = has_strong_peak
 
-                if has_strong_peak:
+                if use_square_root:
                     yq, yd = su.square_root_transform(yq, yd)
                 else:
                     yq, yd = su.power_transformation(yq, yd)
