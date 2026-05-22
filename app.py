@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 
 import spectra_utils as su
 
-st.set_page_config(page_title="Raman Spectra Matching", layout="wide", page_icon="🔬")
+st.set_page_config(page_title="Raman Spectra Matching", layout="wide")
 
 st.title("Raman Spectra Analysis & Matching")
 st.write("Upload here the file raw.")
@@ -25,7 +25,7 @@ if apply_smooth:
 else:
     whittaker_lambda = 1000
 
-st.subheader("1. Upload Query files")
+st.subheader("Upload Query files")
 uploaded_files = st.file_uploader(
     "Put here your .txt (also 'si' calibration files)", 
     type=["txt"], 
