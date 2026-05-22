@@ -21,7 +21,7 @@ if apply_smooth:
     whittaker_lambda = st.sidebar.select_slider(
         "Lambda value for smoothing",
         options=[1, 10, 50, 100, 500, 1000, 5000, 10000],
-        value=100,
+        value=1000,
     )
 else:
     whittaker_lambda = 1000
