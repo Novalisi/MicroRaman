@@ -13,7 +13,7 @@ st.title("Raman Spectra Analysis & Matching")
 st.write("The aim of this site is to provide the possibility to match Raman spectra of unkown samples, polymers and other materials with a database called 'SLoPP and SLoPP-E', for further details about the database and the material available, please refer to the [Rochman Lab official website](https://rochmanlab.wordpress.com/spectral-libraries-for-microplastics-research/).")
 
 st.sidebar.header("Analysis settings")
-st.sidebar.markdown("Use the options below to customize the analysis. You can adjust the number of top matches displayed and whether to apply smoothing to the spectra before matching. If you choose to apply smoothing, you can also select the lambda value for the Whittaker smoothing algorithm, here is used [Rampy libraries](https://rampy.readthedocs.io/en/stable/) and [Whittaker smoothing publication](https://pubs.acs.org/doi/10.1021/ac034173t).")
+st.sidebar.markdown("Use the options below to customize the analysis. You can adjust the number of top matches displayed and whether to apply smoothing to the spectra before matching. If you choose to apply smoothing, you can also select the lambda value for the Whittaker smoothing algorithm, here is used [Rampy libraries](https://rampy.readthedocs.io/en/stable/) and [Whittaker smoothing publication](https://pubs.acs.org/doi/10.1021/ac034173t). It is also applied a baseline correction based on [arPLS algorithm](https://doi.org/10.1039/C4AN01061B).")
 top_n_slider = st.sidebar.slider("Number of Top Match (TOP_N)", min_value=1, max_value=10, value=3)
 apply_smooth = st.sidebar.checkbox("Apply Smoothing Whittaker", value=True)
 
