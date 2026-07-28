@@ -1,24 +1,15 @@
- import streamlit as st
-
+import streamlit as st
 import tempfile
-
 from pathlib import Path
-
 import numpy as np
-
 import pandas as pd
-
 import plotly.graph_objects as go
-
 
 import spectra_utils as su
 
 
 st.set_page_config(page_title="Raman Spectra Matching", layout="wide")
-
-
 st.title("Raman Spectra Analysis & Matching")
-
 st.write("The aim of this site is to provide the possibility to match Raman spectra of unkown samples, polymers and other materials with a database called 'SLoPP and SLoPP-E', for further details about the database and the material available, please refer to the [Rochman Lab official website](https://rochmanlab.wordpress.com/spectral-libraries-for-microplastics-research/).")
 
 
