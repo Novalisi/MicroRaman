@@ -163,40 +163,41 @@ if uploaded_files:
 
             if not unique_matches:
                 continue
-
-            best_cos, best_pea, best_path, yq_plot, yd_plot, x_plot = unique_matches[0]
-
-            with st.expander(f"View Matching Results for: {key}"):
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(
-                    x=x_plot,
-                    y=yq_plot,
-                    mode='lines',
-                    name=f"Query: {key}",
-                    line=dict(color='blue', width=2)
-                ))
-
-                legend_text = f"DB Top Match: {best_path.name}<br>(Cos: {best_cos:.4f}, Pear: {best_pea:.4f})"
-                fig.add_trace(go.Scatter(
-                    x=x_plot,
-                    y=yd_plot,
-                    mode='lines',
-                    name=legend_text,
-                    line=dict(color='red', width=1.5, dash='dash'),
-                    opacity=0.8
-                ))
-
-                fig.update_layout(
-                    title=f"Spectral Comparison: {key} vs {best_path.parent.name}",
-                    xaxis_title="Relative Spectral Range (Interpolated) [cm⁻¹]",
-                    yaxis_title="Intensity (Normalized)",
-                    template="plotly_white",
-                    hovermode="x unified",
-                    height=400,
-                    legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01, bgcolor="rgba(255, 255, 255, 0.7)")
-                )
-                
-                st.plotly_chart(fig, width="stretch")
+            
+            for i in TOP_N:
+                best_cos, best_pea, best_path, yq_plot, yd_plot, x_plot = unique_matches[i]
+    
+                with st.expander(f"View Matching Results for: {key}"):
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(
+                        x=x_plot,
+                        y=yq_plot,
+                        mode='lines',
+                        name=f"Query: {key}",
+                        line=dict(color='blue', width=2)
+                    ))
+    
+                    legend_text = f"DB Top Match: {best_path.name}<br>(Cos: {best_cos:.4f}, Pear: {best_pea:.4f})"
+                    fig.add_trace(go.Scatter(
+                        x=x_plot,
+                        y=yd_plot,
+                        mode='lines',
+                        name=legend_text,
+                        line=dict(color='red', width=1.5, dash='dash'),
+                        opacity=0.8
+                    ))
+    
+                    fig.update_layout(
+                        title=f"Spectral Comparison: {key} vs {best_path.parent.name}",
+                        xaxis_title="Relative Spectral Range (Interpolated) [cm⁻¹]",
+                        yaxis_title="Intensity (Normalized)",
+                        template="plotly_white",
+                        hovermode="x unified",
+                        height=400,
+                        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01, bgcolor="rgba(255, 255, 255, 0.7)")
+                    )
+                    
+                    st.plotly_chart(fig, width="stretch")
 
             for rank, (s_cos, s_pea, path, _, _, _) in enumerate(unique_matches, start=1):
                 rows.append([
