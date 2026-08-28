@@ -41,7 +41,6 @@ min_wavenumber = st.sidebar.slider(
     max_value=1000,
     value=250,
     step=10,
-    help="I punti dello spettro al di sotto di questo valore verranno ignorati nell'analisi.",
 )
 
 apply_smooth = st.sidebar.checkbox("Apply Smoothing Whittaker", value=True)
