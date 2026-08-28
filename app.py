@@ -1,67 +1,84 @@
-import streamlit as st
 import tempfile
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-
 import spectra_utils as su
-
+import streamlit as st
 
 st.set_page_config(page_title="Raman Spectra Matching", layout="wide")
 st.title("Raman Spectra Analysis & Matching")
-st.write("The aim of this site is to provide the possibility to match Raman spectra of unkown samples, polymers and other materials with a database called 'SLoPP and SLoPP-E', for further details about the database and the material available, please refer to the [Rochman Lab official website](https://rochmanlab.wordpress.com/spectral-libraries-for-microplastics-research/).")
-
+st.write(
+    "The aim of this site is to provide the possibility to match Raman spectra"
+    " of unkown samples, polymers and other materials with a database called"
+    " 'SLoPP and SLoPP-E', for further details about the database and the"
+    " material available, please refer to the [Rochman Lab official"
+    " website](https://rochmanlab.wordpress.com/spectral-libraries-for-microplastics-research/)."
+)
 
 st.sidebar.header("Analysis settings")
 
-st.sidebar.markdown("Use the options below to customize the analysis. You can adjust the number of top matches displayed and whether to apply smoothing to the spectra before matching. If you choose to apply smoothing, you can also select the lambda value for the Whittaker smoothing algorithm, here is used [Rampy libraries](https://rampy.readthedocs.io/en/stable/) and [Whittaker smoothing publication](https://pubs.acs.org/doi/10.1021/ac034173t). It is also applied a baseline correction based on [arPLS algorithm](https://doi.org/10.1039/C4AN01061B).")
+st.sidebar.markdown(
+    "Use the options below to customize the analysis. You can adjust the"
+    " number of top matches displayed, set the minimum wavenumber cutoff,"
+    " and choose whether to apply smoothing to the spectra before matching."
+    " If you choose to apply smoothing, you can also select the lambda value"
+    " for the Whittaker smoothing algorithm, here is used [Rampy"
+    " libraries](https://rampy.readthedocs.io/en/stable/) and [Whittaker"
+    " smoothing publication](https://pubs.acs.org/doi/10.1021/ac034173t). It"
+    " is also applied a baseline correction based on [arPLS"
+    " algorithm](https://doi.org/10.1039/C4AN01061B)."
+)
 
-top_n_slider = st.sidebar.slider("Number of Top Match (TOP_N)", min_value=1, max_value=10, value=3)
+top_n_slider = st.sidebar.slider(
+    "Number of Top Match (TOP_N)", min_value=1, max_value=10, value=3
+)
+
+# === NUOVA SEZIONE: Maschera per il Wavenumber minimo ===
+min_wavenumber = st.sidebar.slider(
+    "Minimum Wavenumber Cutoff [cm⁻¹]",
+    min_value=100,
+    max_value=1000,
+    value=250,
+    step=10,
+    help="I punti dello spettro al di sotto di questo valore verranno ignorati nell'analisi.",
+)
 
 apply_smooth = st.sidebar.checkbox("Apply Smoothing Whittaker", value=True)
 
-
 if apply_smooth:
-
     whittaker_lambda = st.sidebar.select_slider(
-
         "Lambda value for smoothing",
-
         options=[1, 10, 50, 100, 500, 1000, 5000, 10000],
-
         value=1000,
-
     )
-
 else:
-
     whittaker_lambda = 1000
 
-
 transform_option = st.sidebar.radio(
-
     "Mathematical Transformation",
-
-    options=["Adaptive (Square root only if peak > 2400 cm⁻¹)", "Force Square Root on all"],
-
-    index=0
-
+    options=[
+        "Adaptive (Square root only if peak > 2400 cm⁻¹)",
+        "Force Square Root on all",
+    ],
+    index=0,
 )
-
 
 st.subheader("Upload Query files")
 
 uploaded_files = st.file_uploader(
-
-    "Here to upload your query spectra files (txt format, with two columns: wavenumber and intensity). You can upload multiple files at once. In order to better calibrate the spectra is used to use the peak of the silicon at 520 cm-1, so the spectra should contain this peak also for different laser wavelength. If you have different spectra for the same sample, please make sure to name them with the same base name (e.g., sample1_01.txt, sample1_02.txt) so they will be grouped together in the analysis, please refer to the documentation in the github repository for more information about the concatenation and preprocessing.", 
-
-    type=["txt"], 
-
-    accept_multiple_files=True
-
+    "Here to upload your query spectra files (txt format, with two columns:"
+    " wavenumber and intensity). You can upload multiple files at once. In"
+    " order to better calibrate the spectra is used to use the peak of the"
+    " silicon at 520 cm-1, so the spectra should contain this peak also for"
+    " different laser wavelength. If you have different spectra for the same"
+    " sample, please make sure to name them with the same base name (e.g.,"
+    " sample1_01.txt, sample1_02.txt) so they will be grouped together in the"
+    " analysis, please refer to the documentation in the github repository for"
+    " more information about the concatenation and preprocessing.",
+    type=["txt"],
+    accept_multiple_files=True,
 )
-
 
 if uploaded_files:
 
@@ -69,7 +86,8 @@ if uploaded_files:
         if x.size < 3:
             raise ValueError("Not enough points in dataset")
 
-        mask = x >= 200
+        # Applicazione della maschera minima configurata
+        mask = x >= min_wavenumber
         x = x[mask]
         y = y[mask]
 
@@ -117,7 +135,8 @@ if uploaded_files:
             if total_queries > 0:
                 progress_bar.progress(min((index + 1) / total_queries, 1.0))
 
-            MIN_X = 250
+            # Utilizzo del valore selezionato dallo slider
+            MIN_X = min_wavenumber
             mask = qx >= MIN_X
             qx, qy = qx[mask], qy[mask]
 
@@ -240,7 +259,10 @@ if uploaded_files:
                             )
                         )
 
-                        legend_text = f"DB Match: {best_path.name}<br>(Cos: {best_cos:.4f}, Pear: {best_pea:.4f})"
+                        legend_text = (
+                            f"DB Match: {best_path.name}<br>(Cos:"
+                            f" {best_cos:.4f}, Pear: {best_pea:.4f})"
+                        )
                         fig.add_trace(
                             go.Scatter(
                                 x=x_plot,
@@ -255,7 +277,9 @@ if uploaded_files:
                         )
 
                         fig.update_layout(
-                            title=f"Rank {rank}: {key} vs {best_path.parent.name}",
+                            title=(
+                                f"Rank {rank}: {key} vs {best_path.parent.name}"
+                            ),
                             xaxis_title="Wavenumber [cm⁻¹]",
                             yaxis_title="Intensity (Normalized)",
                             template="plotly_white",
