@@ -14,6 +14,8 @@ st.write(
     " 'SLoPP and SLoPP-E', for further details about the database and the"
     " material available, please refer to the [Rochman Lab official"
     " website](https://rochmanlab.wordpress.com/spectral-libraries-for-microplastics-research/)."
+    " Lately we had some trouble because of the high density presence of pigments inside the samples, so we added a new database of modern pigments"
+    " from [CHSOS](https://chsopensource.org/)"
 )
 
 st.sidebar.header("Analysis settings")
